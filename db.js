@@ -7,26 +7,30 @@ console.log({
   DB_NAME: process.env.DB_NAME,
   DB_PASSWORD: process.env.DB_PASSWORD ? "exists" : "missing"
 });
-// Create a connection pool using the .env variables
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+
+  ssl: {
+    rejectUnauthorized: true
+  },
+
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Test the connection
 pool.getConnection()
   .then((conn) => {
-    console.log('✅ Connected to MySQL Database successfully');
+    console.log('✅ Connected to TiDB Database successfully');
     conn.release();
   })
   .catch((err) => {
-    console.error('❌ Error connecting to the database:', err.message);
+    console.error('❌ Database connection error:', err.message);
   });
 
 module.exports = pool;
